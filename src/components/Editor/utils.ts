@@ -6,5 +6,6 @@ export const getLanguageFromPath = (filePath: string) => {
   if (filePath.endsWith(".html")) return "html";
   if (filePath.endsWith(".css")) return "css";
   if (filePath.endsWith(".json")) return "json";
+  if (filePath.endsWith(".md")) return "markdown";
   return "plaintext";
 };

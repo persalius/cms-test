@@ -1,5 +1,5 @@
 export type FileType = {
-  content: string;
+  code: string;
 };
 
 export type FileList = Record<string, FileType>;

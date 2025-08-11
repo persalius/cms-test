@@ -109,7 +109,9 @@ export const FileExplorer = ({ files, onSelectFile, activeFile }: Props) => {
               />
               <span>{name}</span>
             </div>
-            {isOpen && item.children && renderTree(item.children, path)}
+            <div style={{ paddingLeft: "1rem" }}>
+              {isOpen && item.children && renderTree(item.children, path)}
+            </div>
           </div>
         );
       } else {

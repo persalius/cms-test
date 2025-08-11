@@ -1,0 +1,147 @@
+/* src/components/SelectionButton/SelectionButton.css */
+
+.template-card {
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  padding: 12px;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+  transition: all 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  min-height: 80px;
+  max-width: 200px;
+}
+
+.template-card:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.1);
+  border-color: #007bff;
+}
+
+/* Template Name - компактное название */
+.template-name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 8px 0;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
+/* Actions Container */
+.template-actions {
+  margin-top: auto;
+}
+
+/* Buttons Container */
+.template-buttons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+/* Buttons - компактные кнопки */
+.template-btn {
+  flex: 1;
+  padding: 6px 8px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  text-align: center;
+  white-space: nowrap;
+  background: white;
+  min-height: 28px;
+}
+
+.template-btn:hover {
+  transform: translateY(-1px);
+}
+
+.template-btn:active {
+  transform: translateY(0);
+}
+
+/* Preview Button */
+.template-btn-preview {
+  background: #f8f9fa;
+  color: #495057;
+  border-color: #dee2e6;
+}
+
+.template-btn-preview:hover {
+  background: #e9ecef;
+  border-color: #adb5bd;
+}
+
+/* Select Button */
+.template-btn-select {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.template-btn-select:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+/* Вариант с одной кнопкой */
+.template-buttons:has(.template-btn:only-child) .template-btn {
+  flex: none;
+  width: 100%;
+}
+
+/* Мобильная адаптация */
+@media (max-width: 480px) {
+  .template-card {
+    max-width: 160px;
+    padding: 10px;
+    min-height: 70px;
+  }
+
+  .template-name {
+    font-size: 13px;
+    margin-bottom: 6px;
+  }
+
+  .template-buttons {
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .template-btn {
+    flex: none;
+    padding: 5px 6px;
+    font-size: 10px;
+    min-height: 24px;
+  }
+}
+
+/* Очень компактный вариант */
+.template-card.compact {
+  padding: 8px;
+  min-height: 60px;
+  max-width: 150px;
+}
+
+.template-card.compact .template-name {
+  font-size: 12px;
+  margin-bottom: 6px;
+}
+
+.template-card.compact .template-btn {
+  padding: 4px 6px;
+  font-size: 10px;
+  min-height: 22px;
+  gap: 2px;
+}
