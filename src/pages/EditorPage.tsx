@@ -1,4 +1,5 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { parse } from "node-html-parser";
 import { useLanding } from "../shared/hooks/useLanding";
 import { Editor } from "../components/Editor/Editor";
 import type { Device } from "../shared/types/device";
@@ -12,6 +13,7 @@ import { SelectionButton } from "../components/SelectionButton/SelectionButton";
 import { useEditorState } from "../shared/hooks/useEditorState";
 import { useEditorActions } from "../shared/hooks/useEditorActions";
 import { TemplateIntegrator } from "../shared/utils/templateIntegrator";
+import { useIframeMessage } from "../shared/hooks/iframe-message/useIframeMessage";
 
 export default function EditorPage() {
   // Device
@@ -34,6 +36,9 @@ export default function EditorPage() {
     onUpdateLandingFiles,
     onUpdateTemplates,
   });
+
+  // Iframe messages
+  useIframeMessage({ editorState, landingState, setLandingState });
 
   // Файлы для Editor (исходные)
   const editorFiles = useMemo((): FileList => {

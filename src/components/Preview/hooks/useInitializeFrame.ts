@@ -1,3 +1,4 @@
+import previewEditorScript from "../preview-editor.js?raw";
 import { useEffect, useMemo, useRef } from "react";
 import {
   loadSandpackClient,
@@ -10,6 +11,18 @@ import type {
 } from "../../../shared/types/template";
 import type { FileList } from "../../../shared/types/file";
 import { TemplateCompiler } from "../../../shared/utils/templateCompiler";
+
+const injectEditorScript = (html: string, script: string): string => {
+  const headClose = html.indexOf("</head>");
+  if (headClose !== -1) {
+    return (
+      html.slice(0, headClose) +
+      `<script>${script}</script>` +
+      html.slice(headClose)
+    );
+  }
+  return `<script>${script}</script>` + html;
+};
 
 type Props = {
   files: FileList;
@@ -33,14 +46,31 @@ export const useInitializeFrame = ({
 
   // Мемоизируем компиляцию файлов для Sandpack
   const sandpackFiles = useMemo((): SandpackBundlerFiles => {
-    return TemplateCompiler.compileForSandpack(
+    const compiled = TemplateCompiler.compileForSandpack(
       files,
       templateInstances,
       templates,
       editorType,
       templateKey
     );
-  }, [files, templateInstances, templates, editorType, templateKey]);
+
+    // Только для landing: вставляем редакторский скрипт в head
+    if (editorType === "landing" && compiled[activeHtml]) {
+      compiled[activeHtml].code = injectEditorScript(
+        compiled[activeHtml].code,
+        previewEditorScript
+      );
+    }
+
+    return compiled;
+  }, [
+    files,
+    templateInstances,
+    templates,
+    editorType,
+    templateKey,
+    activeHtml,
+  ]);
 
   useEffect(() => {
     let cancelled = false;
@@ -52,7 +82,7 @@ export const useInitializeFrame = ({
         const client = await loadSandpackClient(
           iframeRef.current!,
           {
-            files: files,
+            files: sandpackFiles,
             template: "static",
           },
           {
@@ -85,8 +115,6 @@ export const useInitializeFrame = ({
       return;
     }
 
-    // Для шаблонов всегда используем /index.html
-    // Для лендинга используем activeHtml
     const entryFile = editorType === "template" ? "/index.html" : activeHtml;
     const activeFileContent = sandpackFiles[entryFile]?.code;
 

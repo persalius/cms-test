@@ -1,5 +1,6 @@
 import { useCallback, type Dispatch, type SetStateAction } from "react";
-import type { EditorState } from "./useEditorState";
+import type { EditorState } from "../types/editor";
+
 
 interface Props {
   editorState: EditorState;

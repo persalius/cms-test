@@ -9,6 +9,7 @@ const filesFormApi: FileList = {
 <html>
   <head>
     <title>Пример страницы</title>
+    <meta charset="utf-8">
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
@@ -22,6 +23,7 @@ const filesFormApi: FileList = {
 <html>
   <head>
     <title>Waiting Page</title>
+    <meta charset="utf-8">
   </head>
   <body>
     <h1>Waiting Page</h1>
