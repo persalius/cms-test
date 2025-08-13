@@ -225,13 +225,18 @@
     );
   }
 
-  function handleDoubleClick(event) {
-    const element = event.target;
+  function handleModifierClick(event) {
+    const { metaKey, ctrlKey, target } = event;
+
+    if (!(metaKey || ctrlKey)) {
+      return;
+    }
+
     event.preventDefault();
-    if (isEditableElement(element)) {
-      editTextNode(element);
-    } else if (element.closest("[data-template-id]")) {
-      editTemplate(element);
+    if (isEditableElement(target)) {
+      editTextNode(target);
+    } else if (target.closest("[data-template-id]")) {
+      editTemplate(target);
     }
   }
 
@@ -268,7 +273,7 @@
 
   function init() {
     addEditableStyles();
-    document.addEventListener("dblclick", handleDoubleClick);
+    document.addEventListener("click", handleModifierClick);
     document.addEventListener("mouseover", handleMouseOver);
     document.addEventListener("mouseout", handleMouseOut);
     window.parent.postMessage({ type: "READY" }, "*");

@@ -7,12 +7,12 @@ import type { FileList } from "../../shared/types/file";
 
 export interface Props {
   files: FileList;
-  updateFiles: (file: string, value: string) => void;
+  onUpdateFiles: (file: string, value: string) => void;
   activeFile: string;
 }
 
-export const Editor = ({ files, updateFiles, activeFile }: Props) => {
-  const { onChangeCode } = useChangeCode({ activeFile, updateFiles });
+export const Editor = ({ files, onUpdateFiles, activeFile }: Props) => {
+  const { onChangeCode } = useChangeCode({ activeFile, onUpdateFiles });
 
   const code = files[activeFile]?.code || "";
 

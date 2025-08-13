@@ -3,16 +3,16 @@ import debounce from "lodash.debounce";
 
 export interface Props {
   activeFile: string;
-  updateFiles: (file: string, value: string) => void;
+  onUpdateFiles: (file: string, value: string) => void;
 }
 
-export const useChangeCode = ({ updateFiles, activeFile }: Props) => {
+export const useChangeCode = ({ onUpdateFiles, activeFile }: Props) => {
   const debouncedSetFiles = useMemo(
     () =>
       debounce((file: string, value: string) => {
-        updateFiles(file, value);
+        onUpdateFiles(file, value);
       }, 400),
-    [updateFiles]
+    [onUpdateFiles]
   );
 
   const onChangeCode = useCallback(

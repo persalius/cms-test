@@ -5,6 +5,7 @@ export interface TemplateConfig {
   name: string;
   description: string;
   version: string;
+  attributes: Record<string, string>; // атрибуты шаблона с default value
   files: {
     html: string; // основной HTML файл
     css: string[]; // массив CSS файлов
@@ -24,6 +25,7 @@ export interface TemplateInstance {
   templateId: string; // ID исходного шаблона
   props: Record<string, string>;
   htmlFile: string; // в каком HTML файле находится
+  templateConfig: TemplateConfig;
 }
 
 export type TemplateList = Record<string, FileList>;

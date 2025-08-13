@@ -9,7 +9,9 @@ const mockTemplatesFromGithub: TemplateList = {
   "name": "Header",
   "description": "Навигационная панель с логотипом и меню",
   "version": "1.0.0",
-  "attributions": ["title"],
+  "attributes": {
+      "title": "Logo"
+  },
   "files": {
     "html": "/index.html",
     "css": ["/styles.css"],
@@ -94,7 +96,12 @@ document.addEventListener('DOMContentLoaded', function() {
   "name": "Hero Section",
   "description": "Главная секция с заголовком и CTA кнопкой",
   "version": "1.2.0",
-  "attributions": ["title", "description", "button1", "button2"],
+  "attributes": {
+    "title": "Заголовок секции",
+    "description": "Описание",
+    "button1": "Текст основной кнопки",
+    "button2": "Текст дополнительной кнопки"
+  },
   "files": {
     "html": "/index.html",
     "css": ["/styles.css"],
@@ -279,7 +286,13 @@ document.addEventListener('DOMContentLoaded', function() {
   "name": "Card",
   "description": "Компонент для отображения товара с изображением, названием и ценой",
   "version": "1.0.0",
-  "attributions": ["title", "description", "price", "buttonText", "alt"],
+  "attributes": {
+      "title": "Название товара",
+      "description": "Описание товара",
+      "price": "Цена товара",
+      "buttonText": "Текст кнопки",
+      "alt": "Альтернативный текст для изображения"
+  },
   "files": {
     "html": "/index.html",
     "css": ["/styles.css"],
@@ -448,7 +461,9 @@ document.addEventListener('DOMContentLoaded', function() {
   "name": "Footer",
   "description": "Простой подвал с копирайтом и ссылками",
   "version": "1.0.0",
-  "attributions": ["company"],
+  "attributes": {
+    "company": "Название компании"
+  },
   "files": {
     "html": "/index.html",
     "css": ["/styles.css"],

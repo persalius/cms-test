@@ -87,6 +87,7 @@ export class TemplateIntegrator {
       templateId: templateConfig.id,
       props,
       htmlFile: targetHtmlFile,
+      templateConfig,
     };
 
     return {
@@ -125,9 +126,12 @@ export class TemplateIntegrator {
     if (!template) return landingState;
 
     // Обновляем / добавляем атрибуты
-    Object.entries(attributions).forEach(([k, v]) => {
-      if (v == null) return;
-      template.setAttribute(k, String(v));
+    Object.entries(attributions).forEach(([key, value]) => {
+      if (!value) {
+        template.removeAttribute(key);
+      } else {
+        template.setAttribute(key, String(value));
+      }
     });
 
     // Рендер

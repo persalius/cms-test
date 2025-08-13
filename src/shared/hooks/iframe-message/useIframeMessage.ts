@@ -9,12 +9,14 @@ interface Props {
   editorState: EditorState;
   landingState: LandingState;
   setLandingState: Dispatch<SetStateAction<LandingState>>;
+  setPreviewInstanceId: Dispatch<SetStateAction<string | null>>;
 }
 
 export const useIframeMessage = ({
   editorState,
   landingState,
   setLandingState,
+  setPreviewInstanceId,
 }: Props) => {
   const { onUpdateText } = useTextUpdate({
     editorState,
@@ -22,10 +24,7 @@ export const useIframeMessage = ({
     setLandingState,
   });
 
-  const { onUpdateTemplate } = useTemplateEdit({
-    landingState,
-    setLandingState,
-  });
+  const { onUpdateTemplate } = useTemplateEdit({ setPreviewInstanceId });
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {

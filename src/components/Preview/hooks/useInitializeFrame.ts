@@ -66,7 +66,7 @@ export const useInitializeFrame = ({
 
     // Только для landing: вставляем скрипт для редакирования в head
     if (editorType === "landing" && compiled[activeHtml]) {
-      // compiled[activeHtml].code = minifyHtmlSync(compiled[activeHtml].code);
+      compiled[activeHtml].code = minifyHtmlSync(compiled[activeHtml].code);
       compiled[activeHtml].code = injectEditorScript(
         compiled[activeHtml].code,
         previewEditorScript

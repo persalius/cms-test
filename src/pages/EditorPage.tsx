@@ -1,9 +1,7 @@
-import { useCallback, useMemo, useState } from "react";
+import { useCallback, useState } from "react";
 import { useLanding } from "../shared/hooks/useLanding";
-import { Editor } from "../components/Editor/Editor";
 import type { Device } from "../shared/types/device";
 import { DeviceSelector } from "../components/DeviceSelector";
-import { FileExplorer } from "../components/FileExplorer";
 import type { FileList } from "../shared/types/file";
 import { Preview } from "../components/Preview/Preview";
 import { useTemplates } from "../shared/hooks/useTemplates";
@@ -13,10 +11,16 @@ import { useEditorState } from "../shared/hooks/useEditorState";
 import { useEditorActions } from "../shared/hooks/useEditorActions";
 import { TemplateIntegrator } from "../shared/utils/templateIntegrator";
 import { useIframeMessage } from "../shared/hooks/iframe-message/useIframeMessage";
+import { TemplateEditModal } from "@/components/Template/TemplateEditModal";
+import { CodeWorkspace } from "@/components/CodeWorkspace/CodeWorkspace";
 
 export default function EditorPage() {
-  // Device
+  // Settings
   const [device, setDevice] = useState<Device>("desktop");
+  const [isFullView, setIsFullView] = useState(false);
+  const [previewInstanceId, setPreviewInstanceId] = useState<string | null>(
+    null
+  );
 
   // Files
   const { templates, onUpdateTemplates } = useTemplates();
@@ -37,24 +41,12 @@ export default function EditorPage() {
   });
 
   // Iframe messages
-  useIframeMessage({ editorState, landingState, setLandingState });
-
-  // Файлы для Editor (исходные)
-  const editorFiles = useMemo((): FileList => {
-    return editorState.type === "landing"
-      ? landingState.files
-      : templates[editorState.templateKey] || {};
-  }, [editorState, landingState.files, templates]);
-
-  // Файлы для Preview (разные в зависимости от режима)
-  const previewFiles = useMemo((): FileList => {
-    if (editorState.type === "template") {
-      // Для шаблонов передаем исходные файлы, компилятор сам создаст полный HTML
-      return templates[editorState.templateKey] || {};
-    }
-    // Для лендинга передаем файлы с экземплярами шаблонов
-    return landingState.files;
-  }, [editorState, landingState.files, templates]);
+  useIframeMessage({
+    editorState,
+    landingState,
+    setLandingState,
+    setPreviewInstanceId,
+  });
 
   // Функция добавления шаблона
   const handleAddTemplate = useCallback(
@@ -93,6 +85,13 @@ export default function EditorPage() {
         padding: "1rem",
       }}
     >
+      <TemplateEditModal
+        previewInstanceId={previewInstanceId}
+        onClose={() => setPreviewInstanceId(null)}
+        landingState={landingState}
+        setLandingState={setLandingState}
+      />
+
       {/* items list */}
       <div style={{ display: "flex", gap: "12px", marginBottom: "12px" }}>
         <SelectionButton name="Landing page" onPreview={handleEditLanding} />
@@ -104,7 +103,11 @@ export default function EditorPage() {
       </div>
 
       {/* main */}
-      <DeviceSelector device={device} setDevice={setDevice} />
+      <DeviceSelector
+        device={device}
+        setDevice={setDevice}
+        setIsFullView={setIsFullView}
+      />
       <div
         style={{
           display: "flex",
@@ -114,28 +117,23 @@ export default function EditorPage() {
           flex: 1,
         }}
       >
-        <FileExplorer
-          files={editorFiles}
-          onSelectFile={handleSelectFile}
-          activeFile={editorState.activeFile}
-        />
-        <Editor
-          files={editorFiles}
-          updateFiles={handleUpdateFiles}
-          activeFile={editorState.activeFile}
-        />
+        {!isFullView && (
+          <CodeWorkspace
+            landingState={landingState}
+            templates={templates}
+            onSelectFile={handleSelectFile}
+            onUpdateFiles={handleUpdateFiles}
+            editorState={editorState}
+          />
+        )}
         <Preview
-          files={previewFiles}
+          editorState={editorState}
+          landingState={landingState}
+          isFullView={isFullView}
           activeHtml={editorState.activeHtml}
           device={device}
           templateInstances={landingState.templateInstances}
           templates={templates}
-          editorType={editorState.type}
-          templateKey={
-            editorState.type === "template"
-              ? editorState.templateKey
-              : undefined
-          }
         />
       </div>
     </div>

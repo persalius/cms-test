@@ -1,7 +1,6 @@
 import { useCallback, type Dispatch, type SetStateAction } from "react";
 import type { EditorState } from "../types/editor";
 
-
 interface Props {
   editorState: EditorState;
   setEditorState: Dispatch<SetStateAction<EditorState>>;
@@ -50,10 +49,10 @@ export const useEditorActions = ({
   const handleUpdateFiles = useCallback(
     (file: string, value: string) => {
       if (editorState.type === "landing") {
-        return onUpdateLandingFiles(file, value);
+        onUpdateLandingFiles(file, value);
+      } else {
+        onUpdateTemplates(editorState.templateKey, file, value);
       }
-
-      onUpdateTemplates(editorState.templateKey, file, value);
     },
     [editorState, onUpdateLandingFiles, onUpdateTemplates]
   );

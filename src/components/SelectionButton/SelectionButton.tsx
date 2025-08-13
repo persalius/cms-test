@@ -1,4 +1,6 @@
-import "./TemplatesList.css";
+import { Button } from "../ui/button";
+import { Card, CardFooter, CardHeader, CardTitle } from "../ui/card";
+import { Separator } from "../ui/separator";
 
 interface Props {
   name?: string;
@@ -8,28 +10,32 @@ interface Props {
 
 export const SelectionButton = ({ name, onPreview, onAdd }: Props) => {
   return (
-    <div className="template-card">
-      {name && <p className="template-name">{name}</p>}
-      <div className="template-actions">
-        <div className="template-buttons">
-          <button
-            className="template-btn template-btn-preview"
+    <>
+      <Card className="template-card gap-2">
+        <CardHeader>
+          <CardTitle className="text-center">{name}</CardTitle>
+        </CardHeader>
+        <CardFooter className="flex flex-col gap-2">
+          <Button
             onClick={onPreview}
             title="Просмотр шаблона"
+            className="w-full cursor-pointer"
           >
             👁 Открыть редактор
-          </button>
+          </Button>
           {onAdd && (
-            <button
-              className="template-btn template-btn-select"
+            <Button
               onClick={onAdd}
               title="Использовать шаблон"
+              variant="outline"
+              className="w-full cursor-pointer"
             >
               ✨ Использовать
-            </button>
+            </Button>
           )}
-        </div>
-      </div>
-    </div>
+        </CardFooter>
+      </Card>
+      {!onAdd && <Separator orientation="vertical" className="mx-8" />}
+    </>
   );
 };

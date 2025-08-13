@@ -1,6 +1,7 @@
 import { Routes, Route, Navigate } from "react-router-dom";
 import SitesPage from "./pages/SitesPage";
 import EditorPage from "./pages/EditorPage";
+import "./index.css";
 
 export default function App() {
   return (
