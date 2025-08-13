@@ -19,15 +19,44 @@
     "B",
     "I",
   ];
-  let templateInstances = [];
 
-  function isInsideTemplate(element) {
-    const templateElement = element.closest("[data-template-id]");
-    if (!templateElement) return false;
-    const templateId = templateElement.getAttribute("data-template-id");
-    return templateInstances.some((instance) => instance.id === templateId);
+  // Editor styles
+  function addEditableStyles() {
+    if (document.getElementById("preview-editor-styles")) return;
+    const style = document.createElement("style");
+    style.id = "preview-editor-styles";
+    style.textContent = `
+      [data-inline-editor] {
+        all: unset;
+        font: inherit;
+        line-height: inherit;
+        font-weight: inherit;
+        color: inherit;
+        cursor: text;
+      }
+      .preview-editable:hover {
+        outline: 2px dashed #3b82f6 !important;
+        background: rgba(59,130,246,0.05) !important;
+        cursor: text !important;
+      }
+      .preview-editable[contenteditable="true"] {
+        outline: 2px dashed #3b82f6 !important;
+        background: rgba(59,130,246,0.1) !important;
+      }
+      .preview-template:hover {
+        outline: 2px dashed #f59e42 !important;
+        cursor: pointer !important;
+      }
+    `;
+    document.head.appendChild(style);
   }
 
+  // isTempalte
+  function isInsideTemplate(element) {
+    return !!element.closest("[data-template-id]");
+  }
+
+  // isEditableElement
   function isEditableElement(element) {
     if (!element || !element.tagName) return false;
     if (!EDITABLE_TAGS.includes(element.tagName)) return false;
@@ -52,137 +81,197 @@
           selector += "." + classes.join(".");
         }
       }
-      // nth-child
+      // Используем nth-of-type вместо nth-child
       if (element.parentNode) {
         const siblings = Array.from(element.parentNode.children).filter(
           (sib) => sib.tagName === element.tagName
         );
         if (siblings.length > 1) {
           const idx = siblings.indexOf(element) + 1;
-          selector += `:nth-child(${idx})`;
+          selector += `:nth-of-type(${idx})`;
         }
       }
       path.unshift(selector);
       element = element.parentElement;
     }
-    return path.join(" > ");
+
+    return "body > " + path.join(" > ");
   }
 
-  function addEditableStyles() {
-    if (document.getElementById("preview-editor-styles")) return;
-    const style = document.createElement("style");
-    style.id = "preview-editor-styles";
-    style.textContent = `
-      .preview-editable:hover {
-        outline: 2px dashed #3b82f6 !important;
-        background: rgba(59,130,246,0.05) !important;
-        cursor: text !important;
-      }
-      .preview-editable[contenteditable="true"] {
-        outline: 2px solid #3b82f6 !important;
-        background: rgba(59,130,246,0.1) !important;
-      }
-      .preview-template:hover {
-        outline: 2px dashed #f59e42 !important;
-        cursor: pointer !important;
-      }
-    `;
-    document.head.appendChild(style);
-  }
+  function editTextNode(element) {
+    let textNode = null;
 
-  function highlightEditableElements() {
-    document.querySelectorAll(".preview-editable").forEach((el) => {
-      el.classList.remove("preview-editable");
-    });
-    document.querySelectorAll(".preview-template").forEach((el) => {
-      el.classList.remove("preview-template");
-    });
-    document.querySelectorAll("*").forEach((element) => {
-      if (isEditableElement(element)) {
-        element.classList.add("preview-editable");
+    if (element && element.nodeType === Node.TEXT_NODE) {
+      if (!element.textContent || !element.textContent.trim()) return;
+      textNode = element;
+    } else if (element && element.nodeType === Node.ELEMENT_NODE) {
+      const sel = window.getSelection();
+      if (
+        sel &&
+        sel.anchorNode &&
+        sel.anchorNode.nodeType === Node.TEXT_NODE &&
+        element.contains(sel.anchorNode) &&
+        sel.anchorNode.textContent.replace(/\s+/g, "").length
+      ) {
+        textNode = sel.anchorNode;
       }
-    });
-    document.querySelectorAll("[data-template-id]").forEach((el) => {
-      el.classList.add("preview-template");
-    });
-  }
-
-  function makeElementEditable(element) {
-    if (!isEditableElement(element)) return;
-    const originalText = element.textContent;
-    element.setAttribute("contenteditable", "true");
-    element.focus();
-    const range = document.createRange();
-    range.selectNodeContents(element);
-    const selection = window.getSelection();
-    selection.removeAllRanges();
-    selection.addRange(range);
-
-    function finishEditing() {
-      const newText = element.textContent || "";
-      element.removeAttribute("contenteditable");
-      if (newText !== originalText) {
-        const selector = getElementSelector(element);
-        window.parent.postMessage(
-          {
-            type: "TEXT_UPDATED",
-            payload: {
-              elementSelector: selector,
-              newText,
-            },
-          },
-          "*"
+      if (!textNode) {
+        textNode = Array.from(element.childNodes).find(
+          (n) =>
+            n.nodeType === Node.TEXT_NODE &&
+            n.textContent &&
+            n.textContent.replace(/\s+/g, "").length
         );
       }
-      element.removeEventListener("blur", finishEditing);
-      element.removeEventListener("keydown", handleKeyDown);
     }
 
-    function handleKeyDown(event) {
-      if (event.key === "Enter" && !event.shiftKey) {
-        event.preventDefault();
-        element.blur();
-      } else if (event.key === "Escape") {
-        element.textContent = originalText;
-        element.blur();
+    if (!textNode) return;
+
+    const parentEl = textNode.parentNode;
+    if (parentEl.nodeType !== Node.ELEMENT_NODE || !isEditableElement(parentEl))
+      return;
+
+    const originalText = textNode.textContent;
+
+    const wrapper = document.createElement("span");
+    wrapper.setAttribute("contenteditable", "true");
+    wrapper.dataset.inlineEditor = "true";
+    wrapper.textContent = originalText;
+
+    parentEl.replaceChild(wrapper, textNode);
+
+    const range = document.createRange();
+    range.selectNodeContents(wrapper);
+    const sel2 = window.getSelection();
+    sel2.removeAllRanges();
+    sel2.addRange(range);
+    wrapper.focus();
+
+    let finished = false;
+
+    function cleanup(replaceWithNode) {
+      if (wrapper.parentNode) {
+        wrapper.parentNode.replaceChild(replaceWithNode, wrapper);
       }
+      wrapper.removeEventListener("blur", onBlur);
+      wrapper.removeEventListener("keydown", onKeyDown);
     }
 
-    element.addEventListener("blur", finishEditing);
-    element.addEventListener("keydown", handleKeyDown);
-  }
+    function postIfChanged(newValueNode) {
+      const textNodesNow = Array.from(parentEl.childNodes).filter(
+        (n) => n.nodeType === Node.TEXT_NODE
+      );
+      const textNodeIndex = textNodesNow.indexOf(newValueNode);
+      if (textNodeIndex === -1) return;
 
-  function handleDoubleClick(event) {
-    const element = event.target;
-    if (isEditableElement(element)) {
-      event.preventDefault();
-      makeElementEditable(element);
-    } else if (element.closest("[data-template-id]")) {
-      const templateElement = element.closest("[data-template-id]");
+      const newContent = newValueNode.textContent;
+      if (newContent === originalText) return;
+
+      const selector = getElementSelector(parentEl);
       window.parent.postMessage(
         {
-          type: "TEMPLATE_EDIT",
+          type: "TEXT_UPDATED",
           payload: {
-            templateId: templateElement.getAttribute("data-template-id"),
+            elementSelector: selector,
+            newText: newContent.trimStart(),
+            textNodeIndex,
           },
         },
         "*"
       );
     }
+
+    function finish(save) {
+      if (finished) return;
+      finished = true;
+      const replacement = document.createTextNode(
+        save ? wrapper.textContent : originalText
+      );
+      cleanup(replacement);
+      if (save) postIfChanged(replacement);
+    }
+
+    function onBlur() {
+      finish(true);
+    }
+
+    function onKeyDown(e) {
+      if (e.key === "Enter" && !e.shiftKey) {
+        e.preventDefault();
+        wrapper.removeEventListener("blur", onBlur); // не дать второму finish
+        finish(true);
+      } else if (e.key === "Escape") {
+        e.preventDefault();
+        wrapper.removeEventListener("blur", onBlur);
+        finish(false);
+      }
+    }
+
+    wrapper.addEventListener("blur", onBlur);
+    wrapper.addEventListener("keydown", onKeyDown);
   }
 
-  window.addEventListener("message", function (event) {
-    if (event.data.type === "SET_TEMPLATE_INSTANCES") {
-      templateInstances = event.data.payload.instances || [];
-      highlightEditableElements();
+  function editTemplate(element) {
+    const templateElement = element.closest("[data-template-id]");
+
+    window.parent.postMessage(
+      {
+        type: "TEMPLATE_EDIT",
+        payload: {
+          instanceId: templateElement.getAttribute("data-template-id"),
+        },
+      },
+      "*"
+    );
+  }
+
+  function handleDoubleClick(event) {
+    const element = event.target;
+    event.preventDefault();
+    if (isEditableElement(element)) {
+      editTextNode(element);
+    } else if (element.closest("[data-template-id]")) {
+      editTemplate(element);
     }
-  });
+  }
+
+  function handleMouseOver(event) {
+    const element = event.target;
+
+    const isTextElement =
+      element &&
+      EDITABLE_TAGS.includes(element.tagName) &&
+      !isInsideTemplate(element) &&
+      !!element.textContent?.trim();
+    const isTemplate = isInsideTemplate(element);
+
+    if (isTextElement) {
+      return element.classList.add("preview-editable");
+    }
+
+    if (isTemplate) {
+      const templateElement = element.closest("[data-template-id]");
+      return templateElement.classList.add("preview-template");
+    }
+  }
+
+  function handleMouseOut(event) {
+    const element = event.target;
+    if (
+      element &&
+      element.classList.contains("preview-editable") &&
+      !element.isContentEditable
+    ) {
+      element.classList.remove("preview-editable");
+    }
+  }
 
   function init() {
     addEditableStyles();
     document.addEventListener("dblclick", handleDoubleClick);
+    document.addEventListener("mouseover", handleMouseOver);
+    document.addEventListener("mouseout", handleMouseOut);
     window.parent.postMessage({ type: "READY" }, "*");
-    highlightEditableElements();
   }
 
   if (document.readyState === "loading") {

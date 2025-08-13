@@ -24,6 +24,16 @@ const injectEditorScript = (html: string, script: string): string => {
   return `<script>${script}</script>` + html;
 };
 
+function minifyHtmlSync(html: string): string {
+  // Удаляет все переносы строк и табуляцию
+  html = html.replace(/[\r\n\t]+/g, "");
+  // Заменяет несколько пробелов между текстом и тегом на один
+  html = html.replace(/ ([ ]+)(<(?=[a-zA-Z]))/g, " $2");
+  // Заменяет несколько пробелов между закрывающим тегом и текстом на один
+  html = html.replace(/(>)[ ]+ /g, "$1 ");
+  return html;
+}
+
 type Props = {
   files: FileList;
   activeHtml: string;
@@ -54,8 +64,9 @@ export const useInitializeFrame = ({
       templateKey
     );
 
-    // Только для landing: вставляем редакторский скрипт в head
+    // Только для landing: вставляем скрипт для редакирования в head
     if (editorType === "landing" && compiled[activeHtml]) {
+      // compiled[activeHtml].code = minifyHtmlSync(compiled[activeHtml].code);
       compiled[activeHtml].code = injectEditorScript(
         compiled[activeHtml].code,
         previewEditorScript

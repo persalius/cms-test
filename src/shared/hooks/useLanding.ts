@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 import type { FileList } from "../types/file";
 import type { LandingState } from "../types/landng";
-import type { TemplateInstance } from "../types/template";
 
 const filesFormApi: FileList = {
   "/index.html": {
@@ -13,7 +12,13 @@ const filesFormApi: FileList = {
     <link rel="stylesheet" href="/css/style.css" />
   </head>
   <body>
-    <h1>Main  Page</h1>
+    <h1>
+      Main  Page
+      <p>
+        parargraph
+        <span>span</span>
+      </p> 
+    </h1>
     <script src="/scripts/app.js"></script>
   </body>
 </html>`,
@@ -61,30 +66,9 @@ export const useLanding = () => {
     }));
   }, []);
 
-  const updateTemplateProps = useCallback(
-    (instanceId: string, props: Record<string, string>) => {
-      setLandingState((prev) => ({
-        ...prev,
-        templateInstances: prev.templateInstances.map((instance) =>
-          instance.id === instanceId ? { ...instance, props } : instance
-        ),
-      }));
-    },
-    []
-  );
-
-  const addTemplateInstance = useCallback((instance: TemplateInstance) => {
-    setLandingState((prev) => ({
-      ...prev,
-      templateInstances: [...prev.templateInstances, instance],
-    }));
-  }, []);
-
   return {
     landingState,
     setLandingState,
     onUpdateLandingFiles,
-    updateTemplateProps,
-    addTemplateInstance,
   };
 };

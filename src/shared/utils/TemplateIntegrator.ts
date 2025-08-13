@@ -1,11 +1,11 @@
+import { parse } from "node-html-parser";
 import type { FileList } from "../types/file";
 import type { LandingState } from "../types/landng";
 import type { TemplateInstance, TemplateConfig } from "../types/template";
+import { transfomTemplateString } from "./transfomTemplateString";
 
 export class TemplateIntegrator {
-  /**
-   * Добавляет шаблон в лендинг
-   */
+  // Добавляет шаблон в лендинг
   static addTemplateToLanding(
     landingState: LandingState,
     templateFiles: FileList,
@@ -96,21 +96,49 @@ export class TemplateIntegrator {
     };
   }
 
-  /**
-   * Обновляет пропсы существующего шаблона
-   */
-  static updateTemplateProps(
+  // Обновляет атрибуты существующего шаблона
+  static updateTemplateAttributions(
     landingState: LandingState,
     instanceId: string,
-    newProps: Record<string, string>
+    attributions: Record<string, string>
   ): LandingState {
+    if (!attributions || !Object.keys(attributions).length) return landingState;
+
+    const instance = landingState.templateInstances.find(
+      (i) => i.id === instanceId
+    );
+    if (!instance) return landingState;
+
+    const filePath = instance.htmlFile;
+    const fileEntry = landingState.files[filePath];
+    if (!fileEntry) return landingState;
+
+    const original = fileEntry.code;
+    const root = parse(original, { lowerCaseTagName: false });
+
+    // Ищем <Template templateId="instanceId" ... />
+    const template =
+      root.querySelector(`[templateId="${instanceId}"]`) ||
+      root.querySelector(`[templateid="${instanceId}"]`) ||
+      root.querySelector(`Template[templateId="${instanceId}"]`) ||
+      root.querySelector(`template[templateId="${instanceId}"]`);
+    if (!template) return landingState;
+
+    // Обновляем / добавляем атрибуты
+    Object.entries(attributions).forEach(([k, v]) => {
+      if (v == null) return;
+      template.setAttribute(k, String(v));
+    });
+
+    // Рендер
+    const updatedHtml = transfomTemplateString(root.toString());
+
     return {
       ...landingState,
-      templateInstances: landingState.templateInstances.map((instance) =>
-        instance.id === instanceId
-          ? { ...instance, props: { ...instance.props, ...newProps } }
-          : instance
-      ),
+      files: {
+        ...landingState.files,
+        [filePath]: { code: updatedHtml },
+      },
     };
   }
 

@@ -14,10 +14,6 @@ interface Props {
   templates: TemplateList;
   editorType: "landing" | "template";
   templateKey?: string;
-  onUpdateTemplateProps?: (
-    instanceId: string,
-    props: Record<string, string>
-  ) => void;
 }
 
 export const Preview = ({
@@ -28,8 +24,7 @@ export const Preview = ({
   templates,
   editorType,
   templateKey,
-}:
-Props) => {
+}: Props) => {
   const { iframeRef } = useInitializeFrame({
     files,
     activeHtml,

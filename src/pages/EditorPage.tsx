@@ -1,5 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from "react";
-import { parse } from "node-html-parser";
+import { useCallback, useMemo, useState } from "react";
 import { useLanding } from "../shared/hooks/useLanding";
 import { Editor } from "../components/Editor/Editor";
 import type { Device } from "../shared/types/device";
@@ -84,19 +83,6 @@ export default function EditorPage() {
     },
     [editorState, landingState, setLandingState]
   );
-
-  // Функция обновления пропсов шаблона
-  // const handleUpdateTemplateProps = useCallback(
-  //   (instanceId: string, props: Record<string, string>) => {
-  //     const updatedLandingState = TemplateIntegrator.updateTemplateProps(
-  //       landingState,
-  //       instanceId,
-  //       props
-  //     );
-  //     setLandingState(updatedLandingState);
-  //   },
-  //   [landingState, setLandingState]
-  // );
 
   return (
     <div

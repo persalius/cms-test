@@ -1,8 +1,9 @@
 import { useEffect, type Dispatch, type SetStateAction } from "react";
 import type { EditorState } from "../../types/editor";
 import type { LandingState } from "../../types/landng";
-import { useTextUpdated } from "./useTextUpdated";
+import { useTextUpdate } from "./useTextUpdate";
 import { iFrameMessage } from "../../constants/iframe-message";
+import { useTemplateEdit } from "./useTemplateEdit";
 
 interface Props {
   editorState: EditorState;
@@ -15,8 +16,13 @@ export const useIframeMessage = ({
   landingState,
   setLandingState,
 }: Props) => {
-  const { onUpdateText } = useTextUpdated({
+  const { onUpdateText } = useTextUpdate({
     editorState,
+    landingState,
+    setLandingState,
+  });
+
+  const { onUpdateTemplate } = useTemplateEdit({
     landingState,
     setLandingState,
   });
@@ -28,7 +34,7 @@ export const useIframeMessage = ({
       const actions = {
         [iFrameMessage.TEXT_UPDATED]: onUpdateText,
         [iFrameMessage.READY]: () => {},
-        [iFrameMessage.TEMPLATE_EDIT]: () => {},
+        [iFrameMessage.TEMPLATE_EDIT]: onUpdateTemplate,
       };
 
       actions[type]?.(event);
@@ -36,5 +42,5 @@ export const useIframeMessage = ({
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [onUpdateText]);
+  }, [onUpdateTemplate, onUpdateText]);
 };

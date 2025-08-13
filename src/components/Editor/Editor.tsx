@@ -16,44 +16,6 @@ export const Editor = ({ files, updateFiles, activeFile }: Props) => {
 
   const code = files[activeFile]?.code || "";
 
-  // Эффект для прослушивания сообщений от iframe
-  // useEffect(() => {
-  //   const handleIframeMessage = (event) => {
-  //     // Проверяем, что сообщение пришло от нашего iframe и имеет нужный тип
-  //     if (
-  //       previewRef.current &&
-  //       event.source === previewRef.current.contentWindow &&
-  //       event.data.type === "contentChange"
-  //     ) {
-  //       const updatedHtml = event.data.newContent;
-  //       const tempDiv = document.createElement("div");
-  //       tempDiv.innerHTML = updatedHtml;
-  //       tempDiv
-  //         .querySelectorAll("[data-injected]")
-  //         .forEach((el) => el.remove());
-  //       const cleanedHtml = tempDiv.innerHTML.trim();
-
-  //       setFiles((prevFiles) => {
-  //         const newFiles = { ...prevFiles };
-  //         if (newFiles[activeHtml]) {
-  //           const oldHtml = newFiles[activeHtml].code;
-  //           const newHtmlContent = oldHtml.replace(
-  //             /<body>[\s\S]*<\/body>/i,
-  //             `<body>\n    ${cleanedHtml}\n  </body>`
-  //           );
-  //           newFiles[activeHtml] = {
-  //             ...newFiles[activeHtml],
-  //             code: newHtmlContent,
-  //           };
-  //         }
-  //         return newFiles;
-  //       });
-  //     }
-  //   };
-  //   window.addEventListener("message", handleIframeMessage);
-  //   return () => window.removeEventListener("message", handleIframeMessage);
-  // }, [activeFile]);
-
   return (
     <div
       style={{
