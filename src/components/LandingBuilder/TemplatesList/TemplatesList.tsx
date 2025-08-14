@@ -1,7 +1,7 @@
-import { useEditor } from "@/shared/editor/context/hooks/useEditor";
+import { useTemplates } from "@/shared/context/template";
 import { SelectionButton } from "../SelectionButton/SelectionButton";
 import { useAddTemplate } from "./hooks/useAddTemplate";
-import { useTemplates } from "@/shared/template/context";
+import { useEditor } from "@/shared/context/editor";
 
 export const TemplatesList = () => {
   const { templates } = useTemplates();
@@ -9,7 +9,7 @@ export const TemplatesList = () => {
   const { handleAddTemplate } = useAddTemplate();
 
   return (
-    <div style={{ display: "flex", gap: "12px" }}>
+    <>
       {Object.entries(templates).map(([repoName, template]) => {
         const { name } = template["/template.json"]
           ? JSON.parse(template["/template.json"].code)
@@ -24,6 +24,6 @@ export const TemplatesList = () => {
           />
         );
       })}
-    </div>
+    </>
   );
 };

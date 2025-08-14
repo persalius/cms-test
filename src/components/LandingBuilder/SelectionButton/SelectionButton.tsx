@@ -11,26 +11,26 @@ interface Props {
 export const SelectionButton = ({ name, onPreview, onAdd }: Props) => {
   return (
     <>
-      <Card className="template-card gap-2">
+      <Card className="template-card gap-2 py-2 w-full max-w-60">
         <CardHeader>
           <CardTitle className="text-center">{name}</CardTitle>
         </CardHeader>
-        <CardFooter className="flex flex-col gap-2">
+        <CardFooter className="flex gap-2">
           <Button
             onClick={onPreview}
             title="Просмотр шаблона"
-            className="w-full cursor-pointer"
+            className="flex-1 cursor-pointer"
           >
-            👁 Открыть редактор
+            👁 Edit
           </Button>
           {onAdd && (
             <Button
               onClick={onAdd}
               title="Использовать шаблон"
               variant="outline"
-              className="w-full cursor-pointer"
+              className="flex-1 cursor-pointer"
             >
-              ✨ Использовать
+              ✨ Use
             </Button>
           )}
         </CardFooter>

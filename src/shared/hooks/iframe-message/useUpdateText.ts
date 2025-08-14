@@ -1,7 +1,7 @@
 import { parse } from "node-html-parser";
 import { transfomTemplateString } from "../../utils/transfomTemplateString";
-import { useEditor } from "@/shared/editor/context";
-import { useLanding } from "@/shared/landing/context";
+import { useEditor } from "@/shared/context/editor";
+import { useLanding } from "@/shared/context/landing";
 
 // Функция для замены текста по CSS-селектору
 const updateTextInHtml = (

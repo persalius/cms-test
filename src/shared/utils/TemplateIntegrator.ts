@@ -2,8 +2,8 @@ import { parse } from "node-html-parser";
 import type { FileList } from "../types/file";
 import type { TemplateInstance, TemplateConfig } from "../types/template";
 import { transfomTemplateString } from "./transfomTemplateString";
-import type { LandingState } from "../landing/context/types";
 import { getTemplateFromHtml } from "./getTemplateFromHtml";
+import type { LandingState } from "../context/landing/types";
 
 export class TemplateIntegrator {
   // Добавляет шаблон в лендинг

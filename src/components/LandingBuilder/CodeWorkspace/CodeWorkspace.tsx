@@ -2,9 +2,9 @@ import { useMemo } from "react";
 import { Editor } from "../Editor/Editor";
 import { FileExplorer } from "../FileExplorer";
 import type { FileList } from "@/shared/types/file";
-import { useEditor } from "@/shared/editor/context";
-import { useTemplates } from "@/shared/template/context";
-import { useLanding } from "@/shared/landing/context";
+import { useEditor } from "@/shared/context/editor";
+import { useTemplates } from "@/shared/context/template";
+import { useLanding } from "@/shared/context/landing";
 
 export const CodeWorkspace = () => {
   const { editorState, handleSelectFile } = useEditor();

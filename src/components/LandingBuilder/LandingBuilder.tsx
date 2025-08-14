@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { TemplateEditModal } from "@/components/LandingBuilder/Modals/TemplateEditModal/TemplateEditModal";
 import { CodeWorkspace } from "@/components/LandingBuilder/CodeWorkspace/CodeWorkspace";
-import { EditorProvider } from "@/shared/editor/context";
 import { LandingButton } from "@/components/LandingBuilder/LandingButton/LandingButton";
 import type { Device } from "@/shared/types/device";
 import { useIframeMessage } from "@/shared/hooks/iframe-message/useIframeMessage";
@@ -9,6 +8,8 @@ import { TemplatesList } from "./TemplatesList/TemplatesList";
 import { DeviceSelector } from "./DeviceSelector";
 import { Preview } from "./Preview/Preview";
 import { ImageEditModal } from "./Modals/ImageEditModal/ImageEditModal";
+import { EditorProvider } from "@/shared/context/editor";
+import { HtmlnjectorList } from "./HtmlnjectorList/HtmlnjectorList";
 
 export default function LandingBuilder() {
   const [device, setDevice] = useState<Device>("desktop");
@@ -37,6 +38,8 @@ export default function LandingBuilder() {
           <LandingButton />
           <TemplatesList />
         </div>
+
+        <HtmlnjectorList />
 
         <DeviceSelector
           device={device}

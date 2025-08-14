@@ -35,7 +35,7 @@ export const TemplateProvider = ({ children, templatesList }: Props) => {
   );
 
   useEffect(() => {
-    if (Object.keys(templates).length) return;
+    if (Object.keys(templates).length && Object.keys(templatesList).length) return;
     setTemplates(templatesList);
   }, [templates, templatesList]);
 

@@ -1,35 +1,37 @@
 import { useEditor } from "@/shared/context/editor";
 import { useLanding } from "@/shared/context/landing";
 import type { FileList } from "@/shared/types/file";
-import { TemplateIntegrator } from "@/shared/utils/templateIntegrator";
+import { HtmlInjectorIntegrator } from "@/shared/utils/htmlInjectorIntegrator";
 import { useCallback } from "react";
 
-export const useAddTemplate = () => {
+export const useAddHtmlInjector = () => {
   const { editorState } = useEditor();
   const { landingState, setLandingState } = useLanding();
 
-  const handleAddTemplate = useCallback(
-    (template: FileList) => {
+  const handleAddHtmlInjector = useCallback(
+    (htmlInjector: FileList) => {
       if (
         editorState.type !== "landing" ||
         !editorState.activeFile.endsWith(".html")
       ) {
-        alert("Для добавления шаблона выберите HTML файл в Landing Page");
+        alert("Для добавления injector выберите HTML файл в Landing Page");
         return;
       }
+
       try {
-        const updatedLandingState = TemplateIntegrator.addTemplateToLanding(
-          landingState,
-          template,
-          editorState.activeFile
-        );
+        const updatedLandingState =
+          HtmlInjectorIntegrator.addHtmlInjectorToLanding(
+            landingState,
+            htmlInjector,
+            editorState.activeFile
+          );
         setLandingState(updatedLandingState);
       } catch (error) {
-        alert(`Ошибка при добавлении шаблона ${error}`);
+        alert(`Ошибка при добавлении injector ${error}`);
       }
     },
     [editorState.activeFile, editorState.type, landingState, setLandingState]
   );
 
-  return { handleAddTemplate };
+  return { handleAddHtmlInjector };
 };

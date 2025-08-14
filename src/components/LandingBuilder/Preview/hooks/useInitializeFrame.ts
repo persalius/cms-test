@@ -4,7 +4,7 @@ import {
   type SandpackBundlerFiles,
   type SandpackClient,
 } from "@codesandbox/sandpack-client";
-import { useEditor } from "@/shared/editor/context";
+import { useEditor } from "@/shared/context/editor";
 
 type Props = {
   sandpackFiles: SandpackBundlerFiles;

@@ -1,6 +1,6 @@
-import { useEditor } from "@/shared/editor/context";
-import { useLanding } from "@/shared/landing/context";
-import { useTemplates } from "@/shared/template/context";
+import { useEditor } from "@/shared/context/editor";
+import { useLanding } from "@/shared/context/landing";
+import { useTemplates } from "@/shared/context/template";
 import { useCallback } from "react";
 
 export const useUpdateFiles = () => {

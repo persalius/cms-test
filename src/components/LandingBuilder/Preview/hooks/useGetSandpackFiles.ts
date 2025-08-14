@@ -1,13 +1,13 @@
 import { useMemo } from "react";
-import { useEditor } from "@/shared/editor/context";
-import { useLanding } from "@/shared/landing/context";
-import { useTemplates } from "@/shared/template/context";
 import type { FileList } from "@/shared/types/file";
 import { TemplateCompiler } from "@/shared/utils/templateCompiler";
 import type { SandpackBundlerFiles } from "@codesandbox/sandpack-client";
 import previewEditorScript from "../preview-editor.js?raw";
 import { getImageBlob, getIsImage } from "@/shared/utils/image";
 import { IMAGE_EXTENSIONS } from "@/shared/constants/image";
+import { useEditor } from "@/shared/context/editor";
+import { useTemplates } from "@/shared/context/template";
+import { useLanding } from "@/shared/context/landing";
 
 const injectEditorScript = (html: string, script: string): string => {
   const headClose = html.indexOf("</head>");

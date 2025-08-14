@@ -1,4 +1,4 @@
-import { useLanding } from "@/shared/landing/context";
+import { useLanding } from "@/shared/context/landing";
 import { getTemplateFromHtml } from "@/shared/utils/getTemplateFromHtml";
 import parse from "node-html-parser";
 import { useMemo } from "react";

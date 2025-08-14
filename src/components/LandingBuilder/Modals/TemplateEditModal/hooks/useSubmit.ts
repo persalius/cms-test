@@ -1,6 +1,6 @@
 import type { FormEvent } from "react";
-import { useLanding } from "@/shared/landing/context";
 import { TemplateIntegrator } from "@/shared/utils/templateIntegrator";
+import { useLanding } from "@/shared/context/landing";
 
 interface Props {
   editInstanceId: string | null;

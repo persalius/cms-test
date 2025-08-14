@@ -105,7 +105,6 @@ export const useGetLanding = () => {
         }
 
         setFiles(fileMap);
-        console.log("Файлы:", fileMap);
       } catch (err) {
         console.error("Ошибка при загрузке файлов:", err);
       }

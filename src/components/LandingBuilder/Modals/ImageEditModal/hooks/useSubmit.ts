@@ -1,5 +1,5 @@
-import { useEditor } from "@/shared/editor/context";
-import { useLanding } from "@/shared/landing/context";
+import { useEditor } from "@/shared/context/editor";
+import { useLanding } from "@/shared/context/landing";
 import { fileToBase64 } from "@/shared/utils/image";
 import parse from "node-html-parser";
 

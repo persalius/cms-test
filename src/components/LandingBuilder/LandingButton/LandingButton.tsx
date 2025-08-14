@@ -1,4 +1,4 @@
-import { useEditor } from "@/shared/editor/context";
+import { useEditor } from "@/shared/context/editor";
 import { SelectionButton } from "../SelectionButton/SelectionButton";
 
 export const LandingButton = () => {
