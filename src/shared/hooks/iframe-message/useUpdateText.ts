@@ -33,7 +33,7 @@ const updateTextInHtml = (
   return transfomTemplateString(root.toString());
 };
 
-export const useTextUpdate = () => {
+export const useUpdateText = () => {
   const { editorState } = useEditor();
   const { landingState, setLandingState } = useLanding();
 

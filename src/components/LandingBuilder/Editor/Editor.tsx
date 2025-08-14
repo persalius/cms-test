@@ -39,7 +39,6 @@ export const Editor = ({ files, activeFile }: Props) => {
       <MonacoEditor
         key={activeFile}
         height="100%"
-        defaultLanguage={getLanguageFromPath(activeFile)}
         language={getLanguageFromPath(activeFile)}
         value={code}
         theme="vs-light"

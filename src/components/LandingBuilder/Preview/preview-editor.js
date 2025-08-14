@@ -47,6 +47,10 @@
         outline: 2px dashed #f59e42 !important;
         cursor: pointer !important;
       }
+      .preview-image:hover {
+        outline: 2px dashed #3b82f6 !important;
+        cursor: pointer !important;
+      }
     `;
     document.head.appendChild(style);
   }
@@ -55,9 +59,15 @@
   function isInsideTemplate(element) {
     return !!element.closest("[data-template-id]");
   }
+  // isImage
+  function isImageElement(element) {
+    if (!element || element.nodeType !== 1) return false;
+    if (element.tagName !== "IMG") return false;
+    return true;
+  }
 
-  // isEditableElement
-  function isEditableElement(element) {
+  // isEditableText
+  function isEditableText(element) {
     if (!element || !element.tagName) return false;
     if (!EDITABLE_TAGS.includes(element.tagName)) return false;
     if (isInsideTemplate(element)) return false;
@@ -128,7 +138,7 @@
     if (!textNode) return;
 
     const parentEl = textNode.parentNode;
-    if (parentEl.nodeType !== Node.ELEMENT_NODE || !isEditableElement(parentEl))
+    if (parentEl.nodeType !== Node.ELEMENT_NODE || !isEditableText(parentEl))
       return;
 
     const originalText = textNode.textContent;
@@ -225,6 +235,18 @@
     );
   }
 
+  function editImageElement(element) {
+    window.parent.postMessage(
+      {
+        type: "IMAGE_EDIT",
+        payload: {
+          selector: getElementSelector(element),
+        },
+      },
+      "*"
+    );
+  }
+
   function handleModifierClick(event) {
     const { metaKey, ctrlKey, target } = event;
 
@@ -233,10 +255,14 @@
     }
 
     event.preventDefault();
-    if (isEditableElement(target)) {
-      editTextNode(target);
-    } else if (target.closest("[data-template-id]")) {
-      editTemplate(target);
+    if (isEditableText(target)) {
+      return editTextNode(target);
+    }
+    if (isInsideTemplate(target)) {
+      return editTemplate(target);
+    }
+    if (isImageElement(target)) {
+      return editImageElement(target);
     }
   }
 
@@ -249,6 +275,7 @@
       !isInsideTemplate(element) &&
       !!element.textContent?.trim();
     const isTemplate = isInsideTemplate(element);
+    const isImage = isImageElement(element);
 
     if (isTextElement) {
       return element.classList.add("preview-editable");
@@ -257,6 +284,10 @@
     if (isTemplate) {
       const templateElement = element.closest("[data-template-id]");
       return templateElement.classList.add("preview-template");
+    }
+
+    if (isImage) {
+      return element.classList.add("preview-image");
     }
   }
 

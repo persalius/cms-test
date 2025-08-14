@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { TemplateEditModal } from "@/components/LandingBuilder/Template/TemplateEditModal/TemplateEditModal";
+import { TemplateEditModal } from "@/components/LandingBuilder/Modals/TemplateEditModal/TemplateEditModal";
 import { CodeWorkspace } from "@/components/LandingBuilder/CodeWorkspace/CodeWorkspace";
 import { EditorProvider } from "@/shared/editor/context";
 import { LandingButton } from "@/components/LandingBuilder/LandingButton/LandingButton";
@@ -8,13 +8,18 @@ import { useIframeMessage } from "@/shared/hooks/iframe-message/useIframeMessage
 import { TemplatesList } from "./TemplatesList/TemplatesList";
 import { DeviceSelector } from "./DeviceSelector";
 import { Preview } from "./Preview/Preview";
+import { ImageEditModal } from "./Modals/ImageEditModal/ImageEditModal";
 
 export default function LandingBuilder() {
   const [device, setDevice] = useState<Device>("desktop");
   const [isFullView, setIsFullView] = useState(false);
-  const [editInstanceId, setEditInstanceId] = useState<string | null>(null);
 
-  useIframeMessage({ setEditInstanceId });
+  const [editInstanceId, setEditInstanceId] = useState<string | null>(null);
+  const [editImageSelector, setEditImageSelector] = useState<string | null>(
+    null
+  );
+
+  useIframeMessage({ setEditInstanceId, setEditImageSelector });
 
   return (
     <EditorProvider>
@@ -22,6 +27,10 @@ export default function LandingBuilder() {
         <TemplateEditModal
           editInstanceId={editInstanceId}
           onClose={() => setEditInstanceId(null)}
+        />
+        <ImageEditModal
+          editImageSelector={editImageSelector}
+          onClose={() => setEditImageSelector(null)}
         />
 
         <div className="flex gap-3 mb-3">

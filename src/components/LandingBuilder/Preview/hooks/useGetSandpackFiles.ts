@@ -6,6 +6,8 @@ import type { FileList } from "@/shared/types/file";
 import { TemplateCompiler } from "@/shared/utils/templateCompiler";
 import type { SandpackBundlerFiles } from "@codesandbox/sandpack-client";
 import previewEditorScript from "../preview-editor.js?raw";
+import { getImageBlob, getIsImage } from "@/shared/utils/image";
+import { IMAGE_EXTENSIONS } from "@/shared/constants/image";
 
 const injectEditorScript = (html: string, script: string): string => {
   const headClose = html.indexOf("</head>");
@@ -29,6 +31,35 @@ function minifyHtmlSync(html: string): string {
   return html;
 }
 
+const patchImagesInHtmlFiles = (
+  files: SandpackBundlerFiles,
+  activeHtml: string
+): SandpackBundlerFiles => {
+  // Собираем карту картинок по расширению
+  const imageMap: Record<string, string> = {};
+  Object.entries(files).forEach(([path, file]) => {
+    if (getIsImage(path) && file.code) {
+      imageMap[path.replace(/^\//, "")] = getImageBlob(path, file.code);
+    }
+  });
+
+  // Заменяем пути в HTML на dataURL
+  if (files[activeHtml] && files[activeHtml].code) {
+    let html = files[activeHtml].code;
+    const srcRegex = new RegExp(
+      `src=["']([^"']+\\.(${IMAGE_EXTENSIONS.join("|")}))["']`,
+      "gi"
+    );
+    html = html.replace(srcRegex, (match, imgPath) => {
+      const dataUrl = imageMap[imgPath];
+      return dataUrl ? `src="${dataUrl}"` : match;
+    });
+    files[activeHtml].code = html;
+  }
+
+  return files;
+};
+
 export const useGetSandpackFiles = () => {
   const { editorState } = useEditor();
   const { templates } = useTemplates();
@@ -48,13 +79,15 @@ export const useGetSandpackFiles = () => {
 
   // Files for Sandpack
   const sandpackFiles = useMemo((): SandpackBundlerFiles => {
-    const compiled = TemplateCompiler.compileForSandpack(
+    let compiled = TemplateCompiler.compileForSandpack(
       files,
       templateInstances,
       templates,
       editorType,
       templateKey
     );
+
+    compiled = patchImagesInHtmlFiles(compiled, activeHtml);
 
     // Только для landing: вставляем скрипт для редакирования в head
     if (editorType === "landing" && compiled[activeHtml]) {

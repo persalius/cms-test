@@ -23,7 +23,12 @@ export const LandingProvider = ({ children, landingFiles }: Props) => {
   });
 
   useEffect(() => {
-    if (Object.keys(landingState.files).length) return;
+    if (
+      Object.keys(landingState.files).length ||
+      !Object.keys(landingFiles).length
+    ) {
+      return;
+    }
 
     setLandingState((prevState) => ({
       ...prevState,

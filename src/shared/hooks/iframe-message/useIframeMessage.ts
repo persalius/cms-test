@@ -1,15 +1,21 @@
 import { useEffect, type Dispatch, type SetStateAction } from "react";
-import { useTextUpdate } from "./useTextUpdate";
+import { useUpdateText } from "./useUpdateText";
 import { iFrameMessage } from "../../constants/iframe-message";
-import { useTemplateEdit } from "./useTemplateEdit";
+import { useUpdateTemplate } from "./useUpdateTemplate";
+import { useUpdateImage } from "./useUpdateImage";
 
 interface Props {
   setEditInstanceId: Dispatch<SetStateAction<string | null>>;
+  setEditImageSelector: Dispatch<SetStateAction<string | null>>;
 }
 
-export const useIframeMessage = ({ setEditInstanceId }: Props) => {
-  const { onUpdateText } = useTextUpdate();
-  const { onUpdateTemplate } = useTemplateEdit({ setEditInstanceId });
+export const useIframeMessage = ({
+  setEditInstanceId,
+  setEditImageSelector,
+}: Props) => {
+  const { onUpdateText } = useUpdateText();
+  const { onUpdateTemplate } = useUpdateTemplate({ setEditInstanceId });
+  const { onUpdateImage } = useUpdateImage({ setEditImageSelector });
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
@@ -19,6 +25,7 @@ export const useIframeMessage = ({ setEditInstanceId }: Props) => {
         [iFrameMessage.TEXT_UPDATED]: onUpdateText,
         [iFrameMessage.READY]: () => {},
         [iFrameMessage.TEMPLATE_EDIT]: onUpdateTemplate,
+        [iFrameMessage.IMAGE_EDIT]: onUpdateImage,
       };
 
       actions[type]?.(event);
@@ -26,5 +33,5 @@ export const useIframeMessage = ({ setEditInstanceId }: Props) => {
 
     window.addEventListener("message", handleMessage);
     return () => window.removeEventListener("message", handleMessage);
-  }, [onUpdateTemplate, onUpdateText]);
+  }, [onUpdateImage, onUpdateTemplate, onUpdateText]);
 };
