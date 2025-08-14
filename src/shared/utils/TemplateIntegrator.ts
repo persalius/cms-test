@@ -1,15 +1,15 @@
 import { parse } from "node-html-parser";
 import type { FileList } from "../types/file";
-import type { LandingState } from "../types/landng";
 import type { TemplateInstance, TemplateConfig } from "../types/template";
 import { transfomTemplateString } from "./transfomTemplateString";
+import type { LandingState } from "../landing/context/types";
+import { getTemplateFromHtml } from "./getTemplateFromHtml";
 
 export class TemplateIntegrator {
   // Добавляет шаблон в лендинг
   static addTemplateToLanding(
     landingState: LandingState,
     templateFiles: FileList,
-    props: Record<string, string> = {},
     targetHtmlFile: string = "/index.html"
   ): LandingState {
     const templateConfig = this.parseTemplateConfig(templateFiles);
@@ -71,7 +71,6 @@ export class TemplateIntegrator {
       code: this.updateHTMLWithTemplate(
         updatedFiles[targetHtmlFile]?.code || "",
         templateConfig,
-        props,
         instanceId,
         needsUpdate
       ),
@@ -85,7 +84,6 @@ export class TemplateIntegrator {
     const templateInstance: TemplateInstance = {
       id: instanceId,
       templateId: templateConfig.id,
-      props,
       htmlFile: targetHtmlFile,
       templateConfig,
     };
@@ -118,11 +116,7 @@ export class TemplateIntegrator {
     const root = parse(original, { lowerCaseTagName: false });
 
     // Ищем <Template templateId="instanceId" ... />
-    const template =
-      root.querySelector(`[templateId="${instanceId}"]`) ||
-      root.querySelector(`[templateid="${instanceId}"]`) ||
-      root.querySelector(`Template[templateId="${instanceId}"]`) ||
-      root.querySelector(`template[templateId="${instanceId}"]`);
+    const template = getTemplateFromHtml({ html: root, instanceId });
     if (!template) return landingState;
 
     // Обновляем / добавляем атрибуты
@@ -166,7 +160,6 @@ export class TemplateIntegrator {
   private static updateHTMLWithTemplate(
     html: string,
     templateConfig: TemplateConfig,
-    props: Record<string, string>,
     instanceId: string,
     needsDependencies: boolean
   ): string {
@@ -217,7 +210,6 @@ export class TemplateIntegrator {
     // 4. Добавляем React-компонент
     const templateComponent = this.createTemplateComponent(
       templateConfig,
-      props,
       instanceId
     );
 
@@ -489,23 +481,11 @@ export class TemplateIntegrator {
 
   private static createTemplateComponent(
     templateConfig: TemplateConfig,
-    props: Record<string, string>,
     instanceId: string
   ): string {
-    // Создаем атрибуты из пропсов
-    const propsString = Object.entries(props)
-      .map(([key, value]) => `${key}="${value}"`)
-      .join(" ");
-
     // В Editor используем templateId (читаемо), но в Preview будет data-template-id
     const templateIdAttr = `templateId="${instanceId}"`;
-
-    // Создаем React-подобный компонент
-    const allProps = propsString
-      ? `${propsString} ${templateIdAttr}`
-      : templateIdAttr;
-
-    return `<Template name="${templateConfig.id}" ${allProps} />`;
+    return `<Template name="${templateConfig.id}" ${templateIdAttr} />`;
   }
 
   private static parseTemplateConfig(

@@ -1,23 +1,17 @@
 import type { TemplateInstance } from "../types/template";
 
+interface InstanceTemplate {
+  instanceId: string;
+  templateName: string;
+  props: Record<string, string>;
+  startIndex: number;
+  endIndex: number;
+}
+
 export class TemplateParser {
-  /**
-   * Парсит HTML и извлекает все Template компоненты
-   */
-  static parseTemplatesFromHTML(html: string): Array<{
-    instanceId: string;
-    templateName: string;
-    props: Record<string, string>;
-    startIndex: number;
-    endIndex: number;
-  }> {
-    const templates: Array<{
-      instanceId: string;
-      templateName: string;
-      props: Record<string, string>;
-      startIndex: number;
-      endIndex: number;
-    }> = [];
+  // Парсит HTML и извлекает все Template компоненты
+  static parseTemplatesFromHTML(html: string): InstanceTemplate[] {
+    const templates: InstanceTemplate[] = [];
 
     // Регулярное выражение для поиска Template компонентов
     const templateRegex = /<Template\s+([^>]*?)\/>/g;
@@ -48,9 +42,7 @@ export class TemplateParser {
     return templates;
   }
 
-  /**
-   * Заменяет Template компоненты на рендеренный HTML
-   */
+  // Заменяет Template компоненты на рендеренный HTML
   static renderTemplatesInHTML(
     html: string,
     templateInstances: TemplateInstance[],
@@ -76,10 +68,10 @@ export class TemplateParser {
       if (!templateHTML) return;
 
       // Рендерим шаблон с пропсами
-      const renderedTemplate = this.renderTemplateWithProps(templateHTML, {
-        ...template.props,
-        ...instance.props, // пропсы из instance имеют приоритет
-      });
+      const renderedTemplate = this.renderTemplateWithProps(
+        templateHTML,
+        template.props
+      );
 
       // Добавляем атрибуты к корневому элементу шаблона
       const templateWithAttributes = this.addAttributesToRootElement(

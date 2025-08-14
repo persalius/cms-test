@@ -23,7 +23,6 @@ export interface TemplateConfig {
 export interface TemplateInstance {
   id: string; // уникальный ID экземпляра шаблона
   templateId: string; // ID исходного шаблона
-  props: Record<string, string>;
   htmlFile: string; // в каком HTML файле находится
   templateConfig: TemplateConfig;
 }

@@ -1,13 +1,13 @@
 import type { Dispatch, SetStateAction } from "react";
 
 interface Props {
-  setPreviewInstanceId: Dispatch<SetStateAction<string | null>>;
+  setEditInstanceId: Dispatch<SetStateAction<string | null>>;
 }
 
-export const useTemplateEdit = ({ setPreviewInstanceId }: Props) => {
+export const useTemplateEdit = ({ setEditInstanceId }: Props) => {
   const onUpdateTemplate = (event: MessageEvent) => {
     const { instanceId } = event.data.payload;
-    setPreviewInstanceId(instanceId);
+    setEditInstanceId(instanceId);
   };
 
   return { onUpdateTemplate };

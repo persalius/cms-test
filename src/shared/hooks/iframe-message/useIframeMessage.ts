@@ -1,30 +1,15 @@
 import { useEffect, type Dispatch, type SetStateAction } from "react";
-import type { EditorState } from "../../types/editor";
-import type { LandingState } from "../../types/landng";
 import { useTextUpdate } from "./useTextUpdate";
 import { iFrameMessage } from "../../constants/iframe-message";
 import { useTemplateEdit } from "./useTemplateEdit";
 
 interface Props {
-  editorState: EditorState;
-  landingState: LandingState;
-  setLandingState: Dispatch<SetStateAction<LandingState>>;
-  setPreviewInstanceId: Dispatch<SetStateAction<string | null>>;
+  setEditInstanceId: Dispatch<SetStateAction<string | null>>;
 }
 
-export const useIframeMessage = ({
-  editorState,
-  landingState,
-  setLandingState,
-  setPreviewInstanceId,
-}: Props) => {
-  const { onUpdateText } = useTextUpdate({
-    editorState,
-    landingState,
-    setLandingState,
-  });
-
-  const { onUpdateTemplate } = useTemplateEdit({ setPreviewInstanceId });
+export const useIframeMessage = ({ setEditInstanceId }: Props) => {
+  const { onUpdateText } = useTextUpdate();
+  const { onUpdateTemplate } = useTemplateEdit({ setEditInstanceId });
 
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {

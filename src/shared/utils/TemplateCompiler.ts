@@ -5,9 +5,7 @@ import type { SandpackBundlerFiles } from "@codesandbox/sandpack-client";
 import { TemplateParser } from "./templateParser";
 
 export class TemplateCompiler {
-  /**
-   * Компилирует файлы для Sandpack Preview
-   */
+  // Компилирует файлы для Sandpack Preview
   static compileForSandpack(
     sourceFiles: FileList,
     templateInstances: TemplateInstance[],
@@ -147,21 +145,6 @@ ${jsScripts}
       html,
       instances,
       getTemplateHTML
-    );
-  }
-
-  /**
-   * Рендерит шаблон, заменяя переменные на значения из пропсов
-   */
-  private static renderTemplate(
-    html: string,
-    props: Record<string, string>
-  ): string {
-    return html.replace(
-      /\{(\w+)=([^}]+)\}/g,
-      (match, varName, defaultValue) => {
-        return props[varName] !== undefined ? props[varName] : defaultValue;
-      }
     );
   }
 

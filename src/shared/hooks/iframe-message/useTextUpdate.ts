@@ -1,14 +1,7 @@
-import { type Dispatch, type SetStateAction } from "react";
 import { parse } from "node-html-parser";
-import type { EditorState } from "../../types/editor";
-import type { LandingState } from "../../types/landng";
 import { transfomTemplateString } from "../../utils/transfomTemplateString";
-
-interface Props {
-  editorState: EditorState;
-  landingState: LandingState;
-  setLandingState: Dispatch<SetStateAction<LandingState>>;
-}
+import { useEditor } from "@/shared/editor/context";
+import { useLanding } from "@/shared/landing/context";
 
 // Функция для замены текста по CSS-селектору
 const updateTextInHtml = (
@@ -40,11 +33,10 @@ const updateTextInHtml = (
   return transfomTemplateString(root.toString());
 };
 
-export const useTextUpdate = ({
-  editorState,
-  landingState,
-  setLandingState,
-}: Props) => {
+export const useTextUpdate = () => {
+  const { editorState } = useEditor();
+  const { landingState, setLandingState } = useLanding();
+
   const onUpdateText = (event: MessageEvent) => {
     const { elementSelector, newText, textNodeIndex } = event.data.payload;
     const htmlFile = editorState.activeHtml;
