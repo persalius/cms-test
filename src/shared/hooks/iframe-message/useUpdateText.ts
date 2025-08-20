@@ -1,7 +1,7 @@
-import { parse } from "node-html-parser";
-import { transfomTemplateString } from "../../utils/transfomTemplateString";
+import { transfomTemplateString } from "../../utils/template";
 import { useEditor } from "@/shared/context/editor";
 import { useLanding } from "@/shared/context/landing";
+import { parseHtml } from "@/shared/utils/parser";
 
 // Функция для замены текста по CSS-селектору
 const updateTextInHtml = (
@@ -10,7 +10,7 @@ const updateTextInHtml = (
   newText: string,
   textNodeIndex?: number
 ): string => {
-  const root = parse(html, { lowerCaseTagName: false });
+  const root = parseHtml(html);
   const element = root.querySelector(selector);
 
   if (element) {
@@ -39,16 +39,11 @@ export const useUpdateText = () => {
 
   const onUpdateText = (event: MessageEvent) => {
     const { elementSelector, newText, textNodeIndex } = event.data.payload;
-    const htmlFile = editorState.activeHtml;
-    const html = landingState.files[htmlFile]?.code || "";
-
-    if (!html) {
-      alert("HTML file not found");
-      return;
-    }
+    const htmlFile = editorState.activeHtml!;
+    const htmlCode = landingState.files[htmlFile].code;
 
     const updatedHtml = updateTextInHtml(
-      html,
+      htmlCode,
       elementSelector,
       newText,
       textNodeIndex

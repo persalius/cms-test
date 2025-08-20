@@ -1,28 +1,58 @@
+import { useEffect, useState } from "react";
 import type { TemplateList } from "../types/template";
+import type { FileList } from "../types/file";
+import { getIsImage } from "../utils/image";
+import axios from "axios";
+import { parseTemplateConfig } from "../utils/template";
 
 const mockTemplatesFromGithub: TemplateList = {
   header: {
-    "/template.json": {
+    "/config.json": {
       code: `{
   "id": "header",
   "name": "Header",
   "description": "Навигационная панель с логотипом и меню",
   "version": "1.0.0",
-  "attributes": {
-      "title": "Logo"
-  },
-  "files": {
-    "html": "/index.html",
-    "css": ["/styles.css"],
-    "js": ["/scripts.js"]
+  "injections": {
+      "/src/css/header.css": {
+        "target": "comment:header-css",
+        "container": "head"
+      },
+      "/src/scripts/header.js": {
+        "target": "end",
+        "container": "body"
+      }
   },
   "dependencies": {
-    "fonts": [],
-    "libraries": []
+    "fonts": [
+      {
+        "tag": "<link rel='preconnect' href='https://fonts.googleapis.com' />"
+      },
+      {
+        "tag": "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />"
+      },
+      {
+        "tag": "<link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap' rel='stylesheet' />"
+      }
+    ],
+    "libraries": {
+      "aos": [
+        {
+          "tag": "<link href='https://unpkg.com/aos@2.3.1/dist/aos.css' rel='styleshee' />",
+          "target": "before-styles",
+          "container": "head"
+        },
+        {
+          "tag": "<script src='https://unpkg.com/aos@2.3.1/dist/aos.js'></script>",
+          "target": "before-scripts",
+          "container": "head"
+        }
+      ]
+    }
   }
 }`,
     },
-    "/index.html": {
+    "/src/index.html": {
       code: `<header class="main-header">
   <div class="container">
     <div class="logo">{title=Logo}</div>
@@ -34,7 +64,7 @@ const mockTemplatesFromGithub: TemplateList = {
   </div>
 </header>`,
     },
-    "/styles.css": {
+    "/src/css/header.css": {
       code: `.main-header {
   background: #333;
   color: white;
@@ -62,7 +92,7 @@ const mockTemplatesFromGithub: TemplateList = {
   color: #ccc;
 }`,
     },
-    "/scripts.js": {
+    "/src/srcipts/header.js": {
       code: `// Header navigation script
 document.addEventListener('DOMContentLoaded', function() {
   const navLinks = document.querySelectorAll('.main-header .nav a');
@@ -76,12 +106,11 @@ document.addEventListener('DOMContentLoaded', function() {
 });`,
     },
     "/README.md": {
-      code: `# Header Simple Template
-
+      code: `# Header
+      Имя шаблона долдно быть уникальным.
+      Уникальными так-же должны быть имена скриптов и стилей. По-хорошему пусть они начинаются с имени шаблона. Напрмиер header-script.
+      Все файлы, которые будут использоваться в Landing Page должны находится в папке src.
 Простой шаблон навигационной панели с логотипом и меню.
-
-## Использование
-Вставляется в начало body элемента.
 
 ## Настройки
 - {title=Logo} - заменить на название логотипа`,
@@ -89,36 +118,52 @@ document.addEventListener('DOMContentLoaded', function() {
   },
 
   "hero-modern": {
-    "/template.json": {
+    "/config.json": {
       code: `{
   "id": "hero-modern",
   "name": "Hero Section",
   "description": "Главная секция с заголовком и CTA кнопкой",
   "version": "1.2.0",
-  "attributes": {
-    "title": "Заголовок секции",
-    "description": "Описание",
-    "button1": "Текст основной кнопки",
-    "button2": "Текст дополнительной кнопки"
-  },
-  "files": {
-    "html": "/index.html",
-    "css": ["/styles.css"],
-    "js": ["/scripts.js"]
+  "injections": {
+      "/src/css/hero.css": {
+        "target": "comment:hero-css",
+        "container": "head"
+      },
+      "/src/scripts/hero.js": {
+        "target": "end",
+        "container": "body"
+      }
   },
   "dependencies": {
-    "fonts": ["https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap"],
-    "libraries": [{
-      "url": "https://unpkg.com/aos@2.3.1/dist/aos.css",
-      "location": "head-end"
-    }, {
-      "url": "https://unpkg.com/aos@2.3.1/dist/aos.js",
-      "location": "head-end"
-    }]
+    "fonts": [
+      {
+        "tag": "<link rel='preconnect' href='https://fonts.googleapis.com' />"
+      },
+      {
+        "tag": "<link rel='preconnect' href='https://fonts.gstatic.com' crossorigin />"
+      },
+      {
+        "tag": "<link href='https://fonts.googleapis.com/css2?family=Roboto:wght@400;700&display=swap' rel='stylesheet' />"
+      }
+    ],
+    "libraries": {
+      "aos": [
+        {
+          "tag": "<link href='https://unpkg.com/aos@2.3.1/dist/aos.css' rel='stylesheet' />",
+          "target": "before-styles",
+          "container": "head"
+        },
+        {
+          "tag": "<script src='https://unpkg.com/aos@2.3.1/dist/aos.js'></script>",
+          "target": "before-scripts",
+          "container": "head"
+        }
+      ]
+    }
   }
 }`,
     },
-    "/index.html": {
+    "/src/index.html": {
       code: `<section class="hero-section" data-aos="fade-up">
   <div class="hero-container">
     <div class="hero-content">
@@ -135,7 +180,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </section>`,
     },
-    "/styles.css": {
+    "/src/css/hero.css": {
       code: `.hero-section {
   min-height: 100vh;
   display: flex;
@@ -222,7 +267,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 }`,
     },
-    "/scripts.js": {
+    "/src/scripts/hero.js": {
       code: `// Hero section functionality
 (function() {
   'use strict';
@@ -279,24 +324,12 @@ document.addEventListener('DOMContentLoaded', function() {
   },
 
   "card-product": {
-    "/template.json": {
+    "/config.json": {
       code: `{
   "id": "card-product",
   "name": "Card",
   "description": "Компонент для отображения товара с изображением, названием и ценой",
   "version": "1.0.0",
-  "attributes": {
-      "title": "Название товара",
-      "description": "Описание товара",
-      "price": "Цена товара",
-      "buttonText": "Текст кнопки",
-      "alt": "Альтернативный текст для изображения"
-  },
-  "files": {
-    "html": "/index.html",
-    "css": ["/styles.css"],
-    "js": ["/scripts.js"]
-  },
   "dependencies": {
     "fonts": [],
     "libraries": []
@@ -318,7 +351,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </div>`,
     },
-    "/styles.css": {
+    "/src/css/styles.css": {
       code: `.product-card {
   border: 1px solid #e0e0e0;
   border-radius: 12px;
@@ -398,7 +431,7 @@ document.addEventListener('DOMContentLoaded', function() {
   transform: translateY(0);
 }`,
     },
-    "/scripts.js": {
+    "/src/srcipts/scripts.js": {
       code: `// Product card functionality
 (function() {
   'use strict';
@@ -454,20 +487,12 @@ document.addEventListener('DOMContentLoaded', function() {
   },
 
   "footer-minimal": {
-    "/template.json": {
+    "/config.json": {
       code: `{
   "id": "footer-minimal",
   "name": "Footer",
   "description": "Простой подвал с копирайтом и ссылками",
   "version": "1.0.0",
-  "attributes": {
-    "company": "Название компании"
-  },
-  "files": {
-    "html": "/index.html",
-    "css": ["/styles.css"],
-    "js": ["/scripts.js"]
-  },
   "dependencies": {
     "fonts": [],
     "libraries": []
@@ -485,7 +510,7 @@ document.addEventListener('DOMContentLoaded', function() {
   </div>
 </footer>`,
     },
-    "/styles.css": {
+    "/src/css/styles.css": {
       code: `.site-footer {
   background: #333;
   color: white;
@@ -521,7 +546,7 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 }`,
     },
-    "/scripts.js": {
+    "/src/srcipts/scripts.js": {
       code: `// Footer functionality
 console.log('Footer loaded');`,
     },
@@ -540,5 +565,75 @@ console.log('Footer loaded');`,
 };
 
 export const useGetTemplates = () => {
-  return { templates: mockTemplatesFromGithub };
+  const [files, setFiles] = useState<TemplateList>({});
+  const owner = "persalius";
+  const repo = "landing-template";
+  const branch = "main";
+  const limit = 5;
+
+  const arrayBufferToBase64 = (buffer: ArrayBuffer) => {
+    let binary = "";
+    const bytes = new Uint8Array(buffer);
+    const chunkSize = 0x8000;
+    for (let i = 0; i < bytes.length; i += chunkSize) {
+      binary += String.fromCharCode.apply(
+        null,
+        bytes.subarray(i, i + chunkSize) as unknown as number[]
+      );
+    }
+    return btoa(binary);
+  };
+
+  useEffect(() => {
+    const fetchRepoFiles = async () => {
+      try {
+        const { data } = await axios.get(
+          `https://api.github.com/repos/${owner}/${repo}/git/trees/${branch}?recursive=1`
+        );
+
+        const allFiles = data.tree.filter((item: any) => item.type === "blob");
+        const fileMap: FileList = {};
+
+        for (let i = 0; i < allFiles.length; i += limit) {
+          const chunk = allFiles.slice(i, i + limit);
+          const chunkResults = await Promise.all(
+            chunk.map(async (file: any) => {
+              const rawUrl = `https://raw.githubusercontent.com/${owner}/${repo}/${branch}/${file.path}`;
+              const isImage = getIsImage(file.path);
+
+              const fileRes = await axios.get(rawUrl, {
+                responseType: isImage ? "arraybuffer" : "text",
+              });
+
+              return {
+                path: file.path,
+                code: isImage
+                  ? arrayBufferToBase64(fileRes.data)
+                  : fileRes.data,
+              };
+            })
+          );
+
+          chunkResults.forEach(({ path, code }) => {
+            // Важно поставить "/" в начале. Это нужно для CodeSandPack.
+            // При сохранении файлов на github "/" в начале нужно удалять.
+            fileMap[`/${path}`] = { code };
+          });
+        }
+        const config = parseTemplateConfig(fileMap);
+        if (config) {
+          setFiles((prevState) => ({
+            ...prevState,
+            [config.id]: fileMap,
+          }));
+        }
+      } catch (err) {
+        console.error("Ошибка при загрузке файлов:", err);
+      }
+    };
+
+    fetchRepoFiles();
+  }, []);
+
+  return { templates: files };
 };

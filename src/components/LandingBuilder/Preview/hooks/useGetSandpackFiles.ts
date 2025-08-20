@@ -1,4 +1,4 @@
-import { useMemo } from "react";
+import { useCallback, useMemo } from "react";
 import type { FileList } from "@/shared/types/file";
 import { TemplateCompiler } from "@/shared/utils/templateCompiler";
 import type { SandpackBundlerFiles } from "@codesandbox/sandpack-client";
@@ -8,6 +8,17 @@ import { IMAGE_EXTENSIONS } from "@/shared/constants/image";
 import { useEditor } from "@/shared/context/editor";
 import { useTemplates } from "@/shared/context/template";
 import { useLanding } from "@/shared/context/landing";
+import { getTemplateFilesForCurrentPage } from "@/shared/utils/template";
+
+// function minifyHtmlSync(html: string): string {
+//   // Удаляет все переносы строк и табуляцию
+//   html = html.replace(/[\r\n\t]+/g, "");
+//   // Заменяет несколько пробелов между текстом и тегом на один
+//   html = html.replace(/ ([ ]+)(<(?=[a-zA-Z]))/g, " $2");
+//   // Заменяет несколько пробелов между закрывающим тегом и текстом на один
+//   html = html.replace(/(>)[ ]+ /g, "$1 ");
+//   return html;
+// }
 
 const injectEditorScript = (html: string, script: string): string => {
   const headClose = html.indexOf("</head>");
@@ -20,16 +31,6 @@ const injectEditorScript = (html: string, script: string): string => {
   }
   return `<script>${script}</script>` + html;
 };
-
-function minifyHtmlSync(html: string): string {
-  // Удаляет все переносы строк и табуляцию
-  html = html.replace(/[\r\n\t]+/g, "");
-  // Заменяет несколько пробелов между текстом и тегом на один
-  html = html.replace(/ ([ ]+)(<(?=[a-zA-Z]))/g, " $2");
-  // Заменяет несколько пробелов между закрывающим тегом и текстом на один
-  html = html.replace(/(>)[ ]+ /g, "$1 ");
-  return html;
-}
 
 const patchImagesInHtmlFiles = (
   files: SandpackBundlerFiles,
@@ -68,30 +69,51 @@ export const useGetSandpackFiles = () => {
   const templateInstances = landingState.templateInstances;
   const activeHtml = editorState.activeHtml;
   const editorType = editorState.type;
-  const templateKey =
-    editorState.type === "template" ? editorState.templateKey : undefined;
 
-  const files = useMemo((): FileList => {
-    return editorState.type === "template"
-      ? templates[editorState.templateKey] || {}
-      : landingState.files;
-  }, [editorState, landingState.files, templates]);
+  const getFiles = useCallback((): FileList | null => {
+    if (editorState.type === "template") {
+      return templates[editorState.templateKey] || {};
+    }
+    if (editorState.type === "landing") {
+      const templateFiles = getTemplateFilesForCurrentPage({
+        landingState,
+        activeHtml,
+        templates,
+      });
+      return { ...landingState.files, ...templateFiles };
+    }
+    return null;
+  }, [editorState, landingState, templates, activeHtml]);
 
   // Files for Sandpack
-  const sandpackFiles = useMemo((): SandpackBundlerFiles => {
-    let compiled = TemplateCompiler.compileForSandpack(
+  const sandpackFiles = useMemo((): SandpackBundlerFiles | null => {
+    const files = getFiles();
+    if (
+      !Object.keys(templates).length ||
+      !files ||
+      !Object.keys(files).length ||
+      !activeHtml
+    ) {
+      return null;
+    }
+
+    let compiled = TemplateCompiler.compileForSandpack({
       files,
+      activeHtml,
       templateInstances,
       templates,
       editorType,
-      templateKey
-    );
+    });
+
+    if (!compiled) {
+      return null;
+    }
 
     compiled = patchImagesInHtmlFiles(compiled, activeHtml);
 
     // Только для landing: вставляем скрипт для редакирования в head
     if (editorType === "landing" && compiled[activeHtml]) {
-      compiled[activeHtml].code = minifyHtmlSync(compiled[activeHtml].code);
+      // compiled[activeHtml].code = minifyHtmlSync(compiled[activeHtml].code);
       compiled[activeHtml].code = injectEditorScript(
         compiled[activeHtml].code,
         previewEditorScript
@@ -99,14 +121,7 @@ export const useGetSandpackFiles = () => {
     }
 
     return compiled;
-  }, [
-    files,
-    templateInstances,
-    templates,
-    editorType,
-    templateKey,
-    activeHtml,
-  ]);
+  }, [getFiles, templateInstances, templates, editorType, activeHtml]);
 
   return { sandpackFiles };
 };

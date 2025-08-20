@@ -9,7 +9,6 @@ import { DeviceSelector } from "./DeviceSelector";
 import { Preview } from "./Preview/Preview";
 import { ImageEditModal } from "./Modals/ImageEditModal/ImageEditModal";
 import { EditorProvider } from "@/shared/context/editor";
-import { HtmlnjectorList } from "./HtmlnjectorList/HtmlnjectorList";
 
 export default function LandingBuilder() {
   const [device, setDevice] = useState<Device>("desktop");
@@ -38,8 +37,6 @@ export default function LandingBuilder() {
           <LandingButton />
           <TemplatesList />
         </div>
-
-        <HtmlnjectorList />
 
         <DeviceSelector
           device={device}

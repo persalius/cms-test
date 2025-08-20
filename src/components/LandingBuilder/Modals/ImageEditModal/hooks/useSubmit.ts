@@ -1,7 +1,7 @@
 import { useEditor } from "@/shared/context/editor";
 import { useLanding } from "@/shared/context/landing";
 import { fileToBase64 } from "@/shared/utils/image";
-import parse from "node-html-parser";
+import { parseHtml } from "@/shared/utils/parser";
 
 interface Props {
   editImageSelector: string | null;
@@ -25,7 +25,7 @@ export const useSubmit = ({ editImageSelector, onClose }: Props) => {
     const pictureFile = formData.get("picture") as File | null;
 
     const html = files[activeHtml].code;
-    const root = parse(html, { lowerCaseTagName: false });
+    const root = parseHtml(html);
     const imgEl = root.querySelector(editImageSelector);
 
     let updatedFiles = { ...files };

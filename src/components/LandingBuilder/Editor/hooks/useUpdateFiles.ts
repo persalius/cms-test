@@ -11,9 +11,10 @@ export const useUpdateFiles = () => {
   const onUpdateFiles = useCallback(
     (file: string, value: string) => {
       if (editorState.type === "landing") {
-        onUpdateLandingFiles(file, value);
-      } else {
-        onUpdateTemplates(editorState.templateKey, file, value);
+        return onUpdateLandingFiles(file, value);
+      }
+      if (editorState.type === "template") {
+        return onUpdateTemplates(editorState.templateKey, file, value);
       }
     },
     [editorState, onUpdateLandingFiles, onUpdateTemplates]

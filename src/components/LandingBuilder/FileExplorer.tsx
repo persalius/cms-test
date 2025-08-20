@@ -1,3 +1,4 @@
+import type { FileList } from "@/shared/types/file";
 import { useState } from "react";
 
 const FileTextIcon = ({ style }) => (
@@ -56,7 +57,7 @@ const FolderIcon = ({ style }) => (
 );
 
 interface Props {
-  files: any;
+  files: FileList | null;
   onSelectFile: (path: string) => void;
   activeFile: string;
 }
@@ -189,11 +190,11 @@ export const FileExplorer = ({ files, onSelectFile, activeFile }: Props) => {
         height: "100%",
       }}
     >
-      {Object.keys(files).length > 0 ? (
+      {Object.keys(files || {}).length ? (
         renderTree(fileTree)
       ) : (
         <p style={{ color: "#64748b", fontSize: "0.875rem" }}>
-          Файлы не загружены
+          Files not loaded
         </p>
       )}
     </div>

@@ -142,11 +142,15 @@
       return;
 
     const originalText = textNode.textContent;
+    const coreText = originalText
+      .replace(/[\r\n\t]+/g, "")
+      .replace(/^\s{2,}/, " ")
+      .replace(/\s{2,}$/, " ");
 
     const wrapper = document.createElement("span");
     wrapper.setAttribute("contenteditable", "true");
     wrapper.dataset.inlineEditor = "true";
-    wrapper.textContent = originalText;
+    wrapper.textContent = coreText;
 
     parentEl.replaceChild(wrapper, textNode);
 

@@ -19,7 +19,7 @@ interface Props {
 }
 
 export function TemplateEditModal({ editInstanceId, onClose }: Props) {
-  const { defaultAttributes, templateInstance } = useDefaultAttributes({
+  const { defaultAttributes, attributes } = useDefaultAttributes({
     editInstanceId,
   });
   const { handleSubmit } = useSubmit({ editInstanceId, onClose });
@@ -36,20 +36,18 @@ export function TemplateEditModal({ editInstanceId, onClose }: Props) {
             </DialogDescription>
           </DialogHeader>
           <div className="grid gap-4">
-            {Object.keys(templateInstance?.templateConfig.attributes || {}).map(
-              (attribute) => (
-                <div className="grid gap-3" key="attribute">
-                  <Label htmlFor={attribute} className="capitalize">
-                    {attribute}
-                  </Label>
-                  <Input
-                    id={attribute}
-                    name={attribute}
-                    defaultValue={defaultAttributes?.[attribute]}
-                  />
-                </div>
-              )
-            )}
+            {Object.keys(attributes).map((attribute) => (
+              <div className="grid gap-3" key="attribute">
+                <Label htmlFor={attribute} className="capitalize">
+                  {attribute}
+                </Label>
+                <Input
+                  id={attribute}
+                  name={attribute}
+                  defaultValue={defaultAttributes?.[attribute]}
+                />
+              </div>
+            ))}
           </div>
           <DialogFooter>
             <DialogClose asChild>

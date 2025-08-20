@@ -29,11 +29,30 @@ export const EditorProvider = ({ children }: { children: ReactNode }) => {
 
   const handleSelectFile = useCallback(
     (path: string) => {
-      setEditorState((prev) => ({
-        ...prev,
-        activeFile: path,
-        activeHtml: path.endsWith(".html") ? path : prev.activeHtml,
-      }));
+      setEditorState((prevState) => {
+        const { type } = prevState;
+
+        if (type === "template") {
+          return {
+            ...prevState,
+            activeFile: path,
+            activeHtml: "/index.html",
+          };
+        }
+
+        if (type === "landing") {
+          const newActiveHtml = path.endsWith(".html")
+            ? path
+            : prevState.activeHtml;
+          return {
+            ...prevState,
+            activeFile: path,
+            ...(newActiveHtml ? { activeHtml: newActiveHtml } : null),
+          };
+        }
+
+        return prevState;
+      });
     },
     [setEditorState]
   );

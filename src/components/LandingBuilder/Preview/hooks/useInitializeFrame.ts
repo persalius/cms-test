@@ -7,7 +7,7 @@ import {
 import { useEditor } from "@/shared/context/editor";
 
 type Props = {
-  sandpackFiles: SandpackBundlerFiles;
+  sandpackFiles: SandpackBundlerFiles | null;
 };
 
 export const useInitializeFrame = ({ sandpackFiles }: Props) => {
@@ -21,6 +21,7 @@ export const useInitializeFrame = ({ sandpackFiles }: Props) => {
   useEffect(() => {
     if (
       !iframeRef.current ||
+      !sandpackFiles ||
       !Object.keys(sandpackFiles).length ||
       clientRef.current
     ) {
@@ -59,12 +60,25 @@ export const useInitializeFrame = ({ sandpackFiles }: Props) => {
   }, []);
 
   useEffect(() => {
-    if (!clientRef.current || !Object.keys(sandpackFiles).length) {
-      return;
+    if (
+      !clientRef.current ||
+      !sandpackFiles ||
+      !Object.keys(sandpackFiles).length
+    ) {
+      return clientRef.current?.updateSandbox({
+        files: {
+          "/index.html": { code: "" },
+        },
+      });
     }
 
-    const entryFile = editorType === "template" ? "/index.html" : activeHtml;
-    const activeFileContent = sandpackFiles[entryFile]?.code;
+    const entryFiles = {
+      template: activeHtml,
+      landing: activeHtml,
+    };
+
+    const entryFile = entryFiles[editorType];
+    const activeFileContent = entryFile ? sandpackFiles[entryFile]?.code : null;
 
     const filesForSandpack = {
       ...sandpackFiles,

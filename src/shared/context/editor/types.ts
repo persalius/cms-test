@@ -2,18 +2,17 @@ import type { Dispatch, SetStateAction } from "react";
 
 interface LandingEditorState {
   type: "landing";
-  activeFile: string;
-  activeHtml: string;
 }
 
 interface TemplateEditorState {
   type: "template";
-  activeFile: string;
-  activeHtml: string;
-  templateKey: string; // обязательный для template
+  templateKey: string;
 }
 
-export type EditorStateType = LandingEditorState | TemplateEditorState;
+export type EditorStateType = (LandingEditorState | TemplateEditorState) & {
+  activeFile: string;
+  activeHtml?: string;
+};
 
 export type EditorContextType = {
   editorState: EditorStateType;

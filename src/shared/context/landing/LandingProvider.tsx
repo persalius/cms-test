@@ -19,7 +19,6 @@ export const LandingProvider = ({ children, landingFiles }: Props) => {
   const [landingState, setLandingState] = useState<LandingState>({
     files: {},
     templateInstances: [],
-    templateFilesAdded: new Set(),
   });
 
   useEffect(() => {

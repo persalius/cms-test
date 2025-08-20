@@ -11,10 +11,15 @@ export const CodeWorkspace = () => {
   const { templates } = useTemplates();
   const { landingState } = useLanding();
 
-  const editorFiles = useMemo((): FileList => {
-    return editorState.type === "landing"
-      ? landingState.files
-      : templates[editorState.templateKey] || {};
+  const editorFiles = useMemo((): FileList | null => {
+    if (editorState.type === "template") {
+      return templates[editorState.templateKey] || {};
+    }
+    if (editorState.type === "landing") {
+      return landingState.files;
+    }
+
+    return null;
   }, [editorState, landingState.files, templates]);
 
   return (

@@ -5,7 +5,6 @@ import type { Dispatch, SetStateAction } from "react";
 export interface LandingState {
   files: FileList; // исходные файлы для редактирования
   templateInstances: TemplateInstance[]; // информация о вставленных шаблонах
-  templateFilesAdded: Set<string>; // отслеживание уже добавленных файлов шаблонов
 }
 
 export type LandingContextType = {
